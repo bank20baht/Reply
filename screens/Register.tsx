@@ -3,6 +3,8 @@ import React from 'react';
 import {Formik} from 'formik';
 import {Button, TextInput, Text} from 'react-native-paper';
 import {SCREEN_NAME} from '../constants/screensNames';
+import axiosCustom from '../lib/axiosCustom';
+import {MMKV} from 'react-native-mmkv';
 
 type Props = {};
 
@@ -18,8 +20,19 @@ const Register = ({route, navigation}: any, props: Props) => {
     navigation.navigate(SCREEN_NAME.LOGIN_PAGE);
   };
 
-  const handleFormSubmit = (values: any) => {
+  const handleFormSubmit = async (values: any) => {
     console.log(values); // You can perform your registration logic here
+    try {
+      // i try localhost is not work, i use ipv4 by ipconfig in terminal to find it
+      // if have error Axios Err Network, change ipv4 (if not set static ip)
+      const response = await axiosCustom.post(`/auth/register`, {
+        username: values.username,
+        password: values.password,
+      });
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
