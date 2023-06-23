@@ -1,5 +1,5 @@
-import {StyleSheet, View} from 'react-native';
-import React from 'react';
+import {Alert, StyleSheet, View} from 'react-native';
+import React, {useEffect, useState} from 'react';
 import {Formik} from 'formik';
 import {Button, TextInput, Text} from 'react-native-paper';
 import {SCREEN_NAME} from '../constants/screensNames';
@@ -8,30 +8,69 @@ import {MMKV} from 'react-native-mmkv';
 
 export const storage = new MMKV();
 
-type Props = {};
+const Login = ({route, navigation}: any) => {
+  const storedUser = storage.getString('user');
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      if (storedUser) {
+        HomePage();
+      } else {
+        console.log('User data is not available.');
+      }
+    };
 
-const Login = ({route, navigation}: any, props: Props) => {
+    checkLoginStatus();
+  }, [storedUser]);
+
   const initialValues = {
     username: '',
     password: '',
   };
 
+  const HomePage = () => {
+    navigation.navigate(SCREEN_NAME.Tabs);
+  };
+
   const RegisterPage = () => {
     navigation.navigate(SCREEN_NAME.REGISTER_PAGE);
   };
-
+  // i try localhost is not work, i use ipv4 by ipconfig in terminal to find it
+  // if have error Axios Err Network, change ipv4 (if not set static ip)
   const handleFormSubmit = async (values: any) => {
     console.log(values); // You can perform your login logic here
     try {
-      // i try localhost is not work, i use ipv4 by ipconfig in terminal to find it
-      // if have error Axios Err Network, change ipv4 (if not set static ip)
       const response = await axiosCustom.post(`/auth/login`, {
         username: values.username,
         password: values.password,
       });
       console.log(response.data);
+      storage.set('user', JSON.stringify(response.data));
+      if (response.status == 200) {
+        HomePage();
+      }
+      if (response.status == 400) {
+        Alert.alert('Alert Title', 'My Alert Msg', [
+          {
+            text: 'Cancel',
+            onPress: () => console.log('Cancel Pressed'),
+            style: 'cancel',
+          },
+          {text: 'OK', onPress: () => console.log('OK Pressed')},
+        ]);
+      }
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const handleButtonPress = () => {
+    const storedUser = storage.getString('user');
+
+    if (storedUser) {
+      const userObject = JSON.parse(storedUser);
+      console.log(userObject.name);
+    } else {
+      console.log('User data is not available.');
     }
   };
 
@@ -73,6 +112,9 @@ const Login = ({route, navigation}: any, props: Props) => {
           Register
         </Text>
       </View>
+      <Button mode={'outlined'} onPress={handleButtonPress}>
+        Log Data
+      </Button>
     </View>
   );
 };
