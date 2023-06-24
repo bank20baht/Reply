@@ -1,58 +1,57 @@
-import {axiosAuth} from '../axiosCustom';
-import {MMKV} from 'react-native-mmkv';
+import {axiosAuth} from '../axios';
+import {useEffect, useState} from 'react';
 import {useRefreshToken} from './useRefreshToken';
-import {useEffect} from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export const storage = new MMKV();
+export type tokenType = {
+  username?: string;
+  refreshtoken?: string;
+  accesstoken?: string;
+};
 
 const useAxiosAuth = () => {
-  const storedUser = storage.getString('user');
-  let refreshTokenTemp;
-  console.log('storeedUser = ' + storedUser);
+  const refreshToken = useRefreshToken();
+  const [token, setToken] = useState<tokenType>();
 
-  if (storedUser) {
-    const userObject = JSON.parse(storedUser);
-    console.log('userObject.accensstoken = ' + userObject.accesstoken);
-    useEffect(() => {
-      const requestIntercept = axiosAuth.interceptors.request.use(
-        config => {
-          if (!config.headers['Authorization']) {
-            config.headers[
-              'Authorization'
-            ] = `Bearer ${userObject.accesstoken}`;
-          }
-          return config;
-        },
-        error => Promise.reject(error),
-      );
+  const loadData = async () => {
+    let localStorage = await AsyncStorage.getItem('token');
+    let token = localStorage ? JSON.parse(localStorage) : null;
+    setToken(token);
+  };
 
-      const responseIntercept = axiosAuth.interceptors.response.use(
-        response => response,
-        async error => {
-          const prevRequest = error?.config;
-          if (error?.response?.status === 401 && !prevRequest?.sent) {
-            prevRequest.sent = true;
-            const refreshToken = useRefreshToken();
-            refreshTokenTemp = refreshToken; // Assuming refreshToken is a callable function
-            prevRequest.headers[
-              'Authorization'
-            ] = `Bearer ${userObject.accesstoken}`;
-            return axiosAuth(prevRequest);
-          }
-          return Promise.reject(error);
-        },
-      );
+  useEffect(() => {
+    loadData();
+    const requestIntercept = axiosAuth.interceptors.request.use(
+      config => {
+        if (!config.headers['Authorization']) {
+          config.headers['Authorization'] = `Bearer ${token?.accesstoken}`;
+        }
+        return config;
+      },
+      error => Promise.reject(error),
+    );
 
-      return () => {
-        axiosAuth.interceptors.request.eject(requestIntercept);
-        axiosAuth.interceptors.response.eject(responseIntercept);
-      };
-    }, [userObject, refreshTokenTemp]);
+    const responseIntercept = axiosAuth.interceptors.response.use(
+      response => response,
+      async error => {
+        const prevRequest = error?.config;
+        if (error?.response?.status === 401 && !prevRequest?.sent) {
+          prevRequest.sent = true;
+          await refreshToken();
+          prevRequest.headers['Authorization'] = `Bearer ${token?.accesstoken}`;
+          return axiosAuth(prevRequest);
+        }
+        return Promise.reject(error);
+      },
+    );
 
-    return axiosAuth;
-  } else {
-    console.log('Please login');
-  }
+    return () => {
+      axiosAuth.interceptors.request.eject(requestIntercept);
+      axiosAuth.interceptors.response.eject(responseIntercept);
+    };
+  }, [token, refreshToken]);
+
+  return axiosAuth;
 };
 
 export default useAxiosAuth;

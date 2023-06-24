@@ -3,7 +3,7 @@ import React from 'react';
 import {Formik} from 'formik';
 import {Button, TextInput, Text} from 'react-native-paper';
 import {SCREEN_NAME} from '../constants/screensNames';
-import axiosCustom from '../lib/axiosCustom';
+import axios from '../lib/axios';
 import {MMKV} from 'react-native-mmkv';
 
 type Props = {};
@@ -25,7 +25,7 @@ const Register = ({route, navigation}: any, props: Props) => {
     try {
       // i try localhost is not work, i use ipv4 by ipconfig in terminal to find it
       // if have error Axios Err Network, change ipv4 (if not set static ip)
-      const response = await axiosCustom.post(`/auth/register`, {
+      const response = await axios.post(`/auth/register`, {
         username: values.username,
         password: values.password,
       });

@@ -1,18 +1,38 @@
-import axiosCustom from '../axiosCustom';
-import {MMKV} from 'react-native-mmkv';
-export const storage = new MMKV();
+import axios from '../axios';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useState} from 'react';
+
+export type tokenType = {
+  username?: string;
+  refreshtoken?: string;
+  accesstoken?: string;
+};
 
 export const useRefreshToken = () => {
-  const storedUser = storage.getString('user');
-  if (storedUser) {
-    const userObject = JSON.parse(storedUser);
-    console.log(userObject.name + 'refresh token axios');
-    const refreshToken = async () => {
-      const res = await axiosCustom.post('/auth/refresh', {
-        refreshtoken: userObject.refreshtoken,
+  const [token, setToken] = useState<tokenType>();
+
+  const loadData = async () => {
+    let localStorage = await AsyncStorage.getItem('token');
+    let token = localStorage ? JSON.parse(localStorage) : null;
+    setToken(token);
+    console.log('load refresh data');
+  };
+
+  const refreshToken = async () => {
+    try {
+      loadData();
+      const response = await axios.post('/auth/refresh', {
+        refreshtoken: token?.refreshtoken,
       });
-    };
-  } else {
-    console.log('please login');
-  }
+      console.log('req in axios refresh tokens ');
+      console.log(response.data);
+      if (token != null)
+        await AsyncStorage.setItem('token', JSON.stringify(response.data));
+      else console.log('log in');
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  return refreshToken;
 };
