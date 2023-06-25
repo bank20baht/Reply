@@ -1,7 +1,7 @@
 import axios from '../axios';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 
 export type tokenType = {
   username?: string;
@@ -19,9 +19,13 @@ export const useRefreshToken = () => {
     console.log('load refresh data');
   };
 
+  useEffect(() => {
+    loadData();
+  }, []);
+
   const refreshToken = async () => {
     try {
-      loadData();
+      await loadData(); // Update the call to loadData to await its completion
       const response = await axios.post('/auth/refresh', {
         refreshtoken: token?.refreshtoken,
       });

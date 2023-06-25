@@ -37,9 +37,19 @@ const useAxiosAuth = () => {
         const prevRequest = error?.config;
         if (error?.response?.status === 401 && !prevRequest?.sent) {
           prevRequest.sent = true;
-          await refreshToken();
-          prevRequest.headers['Authorization'] = `Bearer ${token?.accesstoken}`;
-          return axiosAuth(prevRequest);
+          try {
+            await refreshToken();
+            const updatedToken = await AsyncStorage.getItem('token');
+            const newToken: tokenType = updatedToken
+              ? JSON.parse(updatedToken)
+              : null;
+            prevRequest.headers[
+              'Authorization'
+            ] = `Bearer ${newToken.accesstoken}`;
+            return axiosAuth(prevRequest);
+          } catch (error) {
+            return Promise.reject(error);
+          }
         }
         return Promise.reject(error);
       },
