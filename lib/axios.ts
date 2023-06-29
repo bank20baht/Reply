@@ -1,5 +1,6 @@
 import axios from 'axios';
 const BASE_URL = 'http://localhost:8000/api';
+// if use to dev types adb reverse tcp:8000 tcp:8000 in terminal and rebuild android
 
 export default axios.create({
   baseURL: BASE_URL,
