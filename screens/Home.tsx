@@ -8,7 +8,7 @@ import PostCard from '../components/PostCard';
 type Props = {};
 
 const Home = (props: Props) => {
-  const [post, setPost] = useState();
+  const [post, setPost] = useState<any[]>([]);
   const axiosAuth = useAxiosAuth();
 
   const [token, setToken] = useState<any>();
@@ -37,13 +37,12 @@ const Home = (props: Props) => {
       <Text>Home</Text>
       <Button onPress={onSubmit}>test</Button>
       {post ? (
-        <>
-          <PostCard />
-          <PostCard />
-          <PostCard />
-          <PostCard />
-          <PostCard />
-        </>
+        post
+          .slice(0)
+          .reverse()
+          .map((item: any) => {
+            return <PostCard post={item} key={item.id} />;
+          })
       ) : (
         <View>
           <Text>loading ....</Text>

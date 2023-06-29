@@ -2,7 +2,13 @@ import {Image, StyleSheet, View} from 'react-native';
 import React from 'react';
 import {Avatar, Button, Card, Text} from 'react-native-paper';
 
-type Props = {};
+type Props = {
+  post?: {
+    images: string;
+    content: string;
+    author: string;
+  };
+};
 
 const postCard = (props: Props) => {
   return (
@@ -19,7 +25,7 @@ const postCard = (props: Props) => {
               margin: 5,
             }}
             source={{
-              uri: 'http://172.22.105.137:8000/public/hello.png',
+              uri: props.post?.images,
             }}
           />
         </View>
@@ -29,10 +35,10 @@ const postCard = (props: Props) => {
             <Text
               variant="bodyLarge"
               style={{fontWeight: '900', marginLeft: 5}}>
-              Bank20baht
+              {props.post?.author}
             </Text>
           </View>
-          <Text variant="bodyMedium">Hello world</Text>
+          <Text variant="bodyMedium">{props.post?.content}</Text>
         </Card.Content>
       </Card>
     </View>
