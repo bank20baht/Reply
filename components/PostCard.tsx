@@ -4,9 +4,11 @@ import {Avatar, Button, Card, Text} from 'react-native-paper';
 
 type Props = {
   post?: {
-    images: string;
+    image: string;
     content: string;
-    author: string;
+    author: {
+      username: string;
+    };
   };
 };
 
@@ -25,7 +27,7 @@ const postCard = (props: Props) => {
               margin: 5,
             }}
             source={{
-              uri: props.post?.images,
+              uri: props.post?.image,
             }}
           />
         </View>
@@ -35,7 +37,7 @@ const postCard = (props: Props) => {
             <Text
               variant="bodyLarge"
               style={{fontWeight: '900', marginLeft: 5}}>
-              {props.post?.author}
+              {props.post?.author.username}
             </Text>
           </View>
           <Text variant="bodyMedium">{props.post?.content}</Text>

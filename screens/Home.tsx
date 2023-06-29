@@ -27,6 +27,7 @@ const Home = (props: Props) => {
     try {
       const response = await axiosAuth.get('/posts');
       setPost(response?.data);
+      console.log(response.data);
     } catch (error) {
       console.error(error);
     }

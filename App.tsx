@@ -12,6 +12,7 @@ import Login from './screens/Login';
 import Option from './screens/Option';
 import Profile from './screens/Profile';
 import Register from './screens/Register';
+import AddPost from './screens/AddPost';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -30,9 +31,11 @@ const TabScreens = () => {
           if (route.name === SCREEN_NAME.HOME_PAGE) {
             iconName = 'home';
           } else if (route.name === SCREEN_NAME.PROFILE_PAGE) {
-            iconName = 'areachart';
+            iconName = 'smileo';
           } else if (route.name === SCREEN_NAME.OPTION_PAGE) {
-            iconName = 'tool';
+            iconName = 'setting';
+          } else if (route.name == SCREEN_NAME.ADDPOST_PAGE) {
+            iconName = 'plussquare';
           }
           if (!iconName) {
             return null; // or provide a fallback icon or handle the error accordingly
@@ -54,6 +57,20 @@ const TabScreens = () => {
         component={Home}
         options={{
           title: 'Home',
+          headerTitleStyle: {
+            color: '#e0ffff',
+          },
+          headerStyle: {
+            backgroundColor: '#0085ff',
+          },
+          headerTitleAlign: 'center',
+        }}
+      />
+      <Tab.Screen
+        name={SCREEN_NAME.ADDPOST_PAGE}
+        component={AddPost}
+        options={{
+          title: 'Add Post',
           headerTitleStyle: {
             color: '#e0ffff',
           },
