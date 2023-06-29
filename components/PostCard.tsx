@@ -19,7 +19,7 @@ const postCard = (props: Props) => {
               margin: 5,
             }}
             source={{
-              uri: 'https://img.freepik.com/free-photo/lovely-pet-portrait-isolated_23-2149192347.jpg?w=360&t=st=1687774627~exp=1687775227~hmac=0ec8526cff10c76807ed10888f56e2f7c2d635c9517ee3310aaa4b48d4f9952b',
+              uri: 'http://172.22.105.137:8000/public/hello.png',
             }}
           />
         </View>
